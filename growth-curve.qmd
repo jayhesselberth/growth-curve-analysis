@@ -25,7 +25,7 @@ library(here)
 fname <- here("data/2024-01-31-growth-curve.xlsx")
 
 plate_map <- tribble(
-  ~ sample, ~ media, ~ rep, ~ well,
+  ~sample, ~media, ~rep, ~well,
   "blank", "1:1", 1, "B3",
   "blank", "1:1", 2, "B4",
   "blank", "1:1", 3, "C3",
@@ -70,7 +70,7 @@ col_names <- c("well", time_cols, "extra")
 
 xx <- readxl::read_excel(fname, skip = 29, col_names = col_names, sheet = "main")
 
-plot_tbl <- 
+plot_tbl <-
   select(xx, -extra) |>
   pivot_longer(-well) |>
   left_join(plate_map, by = "well") |>
@@ -83,7 +83,7 @@ plot_tbl <-
   drop_na() |>
   group_by(sample, media, time) |>
   summarize(
-    value_mean = mean(value), 
+    value_mean = mean(value),
     value_sd = sd(value)
   )
 
@@ -91,17 +91,17 @@ ggplot(
   filter(plot_tbl, sample != "blank"),
   aes(
     x = time,
-    y = value_mean, 
+    y = value_mean,
     ymin = value_mean - value_sd,
     ymax = value_mean + value_sd,
-    color = sample 
+    color = sample
   )
 ) +
   geom_errorbar(size = 0.1, width = 0.1) +
   geom_point(size = 1.2) +
   geom_line(aes(group = sample), linewidth = 0.3) +
   theme_cowplot() +
-  facet_grid(~ media) +
+  facet_grid(~media) +
   labs(
     x = "Time (hours)",
     y = "Optical density (660 nm)",
@@ -120,28 +120,25 @@ fname2 <- here("data/2024-02-07-growth-curve.xlsx")
 xx <- readxl::read_excel(fname2, col_names = col_names, sheet = "main")
 
 plate_map <- tribble(
-  ~ sample, ~ media, ~ rep, ~ well,
+  ~sample, ~media, ~rep, ~well,
   "FRS1", "1:1", 1, "C4",
   "FRS1", "1:1", 2, "C5",
   "FRS1", "1:1", 3, "C6",
   "frs1-1", "1:1", 1, "C7",
   "frs1-1", "1:1", 2, "C8",
   "frs1-1", "1:1", 3, "C9",
-  
   "FRS1", "1:400", 1, "D4",
   "FRS1", "1:400", 2, "D5",
   "FRS1", "1:400", 3, "D6",
   "frs1-1", "1:400", 1, "D7",
   "frs1-1", "1:400", 2, "D8",
   "frs1-1", "1:400", 3, "D9",
-  
   "FRS1", "1:800", 1, "E4",
   "FRS1", "1:800", 2, "E5",
   "FRS1", "1:800", 3, "E6",
   "frs1-1", "1:800", 1, "E7",
   "frs1-1", "1:800", 2, "E8",
   "frs1-1", "1:800", 3, "E9",
-  
   "FRS1", "0.1:400", 1, "F4",
   "FRS1", "0.1:400", 2, "F5",
   "FRS1", "0.1:400", 3, "F6",
@@ -150,7 +147,7 @@ plate_map <- tribble(
   "frs1-1", "0.1:400", 3, "F9",
 )
 
-plot_tbl <- 
+plot_tbl <-
   select(xx, -extra) |>
   pivot_longer(-well) |>
   left_join(plate_map, by = "well") |>
@@ -163,7 +160,7 @@ plot_tbl <-
   drop_na() |>
   group_by(sample, media, time) |>
   summarize(
-    value_mean = mean(value), 
+    value_mean = mean(value),
     value_sd = sd(value)
   )
 
@@ -171,22 +168,146 @@ ggplot(
   filter(plot_tbl, sample != "blank"),
   aes(
     x = time,
-    y = value_mean, 
+    y = value_mean,
     ymin = value_mean - value_sd,
     ymax = value_mean + value_sd,
-    color = sample 
+    color = sample
   )
 ) +
   geom_errorbar(size = 0.1, width = 0.1) +
   geom_point(size = 1.2) +
   geom_line(aes(group = sample), linewidth = 0.3) +
   theme_minimal_grid() +
-  facet_grid(~ media) +
+  facet_grid(~media) +
   labs(
     x = "Time (hours)",
     y = "Optical density (660 nm)",
     title = "Growth analysis of S. cerevisiae",
     subtitle = "2024-02-07"
+  ) +
+  scale_color_okabe_ito()
+
+```
+
+```{r}
+#| label: growth-curve-2
+#| message: false
+#| warning: false
+fname2 <- here("data/2025-05-09-growth-curve.xlsx")
+xx <- readxl::read_excel(fname2, col_names = col_names)
+
+plate_map <- tribble(
+  ~sample, ~media, ~rep, ~well,
+  "Blank", "0", 1, "B1",
+  "Blank", "250", 1, "C1",
+  "Blank", "500", 1, "D1",
+  "Blank", "100", 1, "E1",
+  "Blank", "1500", 1, "F1",
+  "Blank", "2000", 1, "G1",
+  "Blank", "0", 2, "B2",
+  "Blank", "250", 2, "C2",
+  "Blank", "500", 2, "D2",
+  "Blank", "100", 2, "E2",
+  "Blank", "1500", 2, "F2",
+  "Blank", "2000", 2, "G2",
+  "Blank", "0", 3, "B3",
+  "Blank", "250", 3, "C3",
+  "Blank", "500", 3, "D3",
+  "Blank", "100", 3, "E3",
+  "Blank", "1500", 3, "F3",
+  "Blank", "2000", 3, "G3",
+  "WT", "0", 1, "B4",
+  "WT", "250", 1, "C4",
+  "WT", "500", 1, "D4",
+  "WT", "100", 1, "E4",
+  "WT", "1500", 1, "F4",
+  "WT", "2000", 1, "G4",
+  "WT", "0", 2, "B5",
+  "WT", "250", 2, "C5",
+  "WT", "500", 2, "D5",
+  "WT", "100", 2, "E5",
+  "WT", "1500", 2, "F5",
+  "WT", "2000", 2, "G5",
+  "WT", "0", 3, "B6",
+  "WT", "250", 3, "C6",
+  "WT", "500", 3, "D6",
+  "WT", "100", 3, "E6",
+  "WT", "1500", 3, "F6",
+  "WT", "2000", 3, "G6",
+  "AlaRS", "0", 1, "B7",
+  "AlaRS", "250", 1, "C7",
+  "AlaRS", "500", 1, "D7",
+  "AlaRS", "100", 1, "E7",
+  "AlaRS", "1500", 1, "F7",
+  "AlaRS", "2000", 1, "G7",
+  "AlaRS", "0", 2, "B8",
+  "AlaRS", "250", 2, "C8",
+  "AlaRS", "500", 2, "D8",
+  "AlaRS", "100", 2, "E8",
+  "AlaRS", "1500", 2, "F8",
+  "AlaRS", "2000", 2, "G8",
+  "AlaRS", "0", 3, "B9",
+  "AlaRS", "250", 3, "C9",
+  "AlaRS", "500", 3, "D9",
+  "AlaRS", "100", 3, "E9",
+  "AlaRS", "1500", 3, "F9",
+  "AlaRS", "2000", 3, "G9",
+  "ThrRS", "0", 1, "B10",
+  "ThrRS", "250", 1, "C10",
+  "ThrRS", "500", 1, "D10",
+  "ThrRS", "100", 1, "E10",
+  "ThrRS", "1500", 1, "F10",
+  "ThrRS", "2000", 1, "G10",
+  "ThrRS", "0", 2, "B11",
+  "ThrRS", "250", 2, "C11",
+  "ThrRS", "500", 2, "D11",
+  "ThrRS", "100", 2, "E11",
+  "ThrRS", "1500", 2, "F11",
+  "ThrRS", "2000", 2, "G11",
+  "ThrRS", "0", 3, "B12",
+  "ThrRS", "250", 3, "C12",
+  "ThrRS", "500", 3, "D12",
+  "ThrRS", "100", 3, "E12",
+  "ThrRS", "1500", 3, "F12",
+  "ThrRS", "2000", 3, "G12"
+)
+
+times <- seq(30, 24 * 60, 30) / 60
+
+plot_tbl <-
+  readxl::read_excel(fname2, sheet = "main") |>
+  mutate(Time = times) |>
+  pivot_longer(-Time) |>
+  filter(!is.na(value) & value != 37) |>
+  rename(well = name, time = Time) |>
+  left_join(plate_map) |>
+  select(-well) |>
+  group_by(sample, media, time) |>
+  summarize(
+    value_mean = mean(value),
+    value_sd = sd(value)
+  )
+
+ggplot(
+  filter(plot_tbl, sample != "Blank"),
+  aes(
+    x = time,
+    y = value_mean,
+    ymin = value_mean - value_sd,
+    ymax = value_mean + value_sd,
+    color = sample
+  )
+) +
+  geom_errorbar(size = 0.1, width = 0.1) +
+  geom_point(size = 1.2) +
+  geom_line(aes(group = sample), linewidth = 0.3) +
+  theme_minimal_grid() +
+  facet_grid(~media) +
+  labs(
+    x = "Time (hours)",
+    y = "Optical density (600 nm)",
+    title = "Growth analysis of E. coli",
+    subtitle = "2025-05-09"
   ) +
   scale_color_okabe_ito()
 
